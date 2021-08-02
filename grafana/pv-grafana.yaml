@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata: 
+  name: grafana-pv
+  labels:
+    release: test
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: grafana
+  nfs:
+    server: 1cd6e49960-bee93.cn-beijing.nas.aliyuncs.com
+    path: /yunwei/monitor

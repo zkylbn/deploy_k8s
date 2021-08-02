@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    release: test
+spec:
+  selector:
+    matchLabels:
+      release: test
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
+  storageClassName: grafana
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      initContainers:
+      - name: grafana-chown
+        image: busybox
+        command: ["chown", "-R", "472:472", "/var/lib/grafana"]
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /var/lib/grafana
+            name: grafana
+      containers:
+        - image: grafana/grafana:7.2.0
+          imagePullPolicy: IfNotPresent
+          name: grafana
+          ports:
+            - containerPort: 3000
+              name: http-grafana
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /robots.txt
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: 3Gi
+            requests:
+              cpu: 300m
+              memory: 500m
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana
+      volumes:
+        - name: grafana
+          persistentVolumeClaim:
+            claimName: grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: http-grafana
+      nodePort: 30111
+  selector:
+    app: grafana
+  sessionAffinity: None
+  type: NodePort
+  #type: ClusterIP

@@ -1,0 +1,283 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "1"
+    meta.helm.sh/release-name: loki
+    meta.helm.sh/release-namespace: monitor
+  creationTimestamp: "2021-04-15T10:54:43Z"
+  generation: 1
+  labels:
+    app: promtail
+    app.kubernetes.io/managed-by: Helm
+    chart: promtail-2.0.2
+    heritage: Helm
+    release: loki
+  managedFields:
+  - apiVersion: apps/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:deprecated.daemonset.template.generation: {}
+          f:meta.helm.sh/release-name: {}
+          f:meta.helm.sh/release-namespace: {}
+        f:labels:
+          .: {}
+          f:app: {}
+          f:app.kubernetes.io/managed-by: {}
+          f:chart: {}
+          f:heritage: {}
+          f:release: {}
+      f:spec:
+        f:revisionHistoryLimit: {}
+        f:selector:
+          f:matchLabels:
+            .: {}
+            f:app: {}
+            f:release: {}
+        f:template:
+          f:metadata:
+            f:annotations:
+              .: {}
+              f:checksum/config: {}
+              f:prometheus.io/port: {}
+              f:prometheus.io/scrape: {}
+            f:labels:
+              .: {}
+              f:app: {}
+              f:release: {}
+          f:spec:
+            f:affinity: {}
+            f:containers:
+              k:{"name":"promtail"}:
+                .: {}
+                f:args: {}
+                f:env:
+                  .: {}
+                  k:{"name":"HOSTNAME"}:
+                    .: {}
+                    f:name: {}
+                    f:valueFrom:
+                      .: {}
+                      f:fieldRef:
+                        .: {}
+                        f:apiVersion: {}
+                        f:fieldPath: {}
+                f:image: {}
+                f:imagePullPolicy: {}
+                f:name: {}
+                f:ports:
+                  .: {}
+                  k:{"containerPort":3101,"protocol":"TCP"}:
+                    .: {}
+                    f:containerPort: {}
+                    f:name: {}
+                    f:protocol: {}
+                f:readinessProbe:
+                  .: {}
+                  f:failureThreshold: {}
+                  f:httpGet:
+                    .: {}
+                    f:path: {}
+                    f:port: {}
+                    f:scheme: {}
+                  f:initialDelaySeconds: {}
+                  f:periodSeconds: {}
+                  f:successThreshold: {}
+                  f:timeoutSeconds: {}
+                f:resources: {}
+                f:securityContext:
+                  .: {}
+                  f:readOnlyRootFilesystem: {}
+                  f:runAsGroup: {}
+                  f:runAsUser: {}
+                f:terminationMessagePath: {}
+                f:terminationMessagePolicy: {}
+                f:volumeMounts:
+                  .: {}
+                  k:{"mountPath":"/etc/promtail"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                  k:{"mountPath":"/run/promtail"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                  k:{"mountPath":"/var/lib/docker/containers"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                    f:readOnly: {}
+                  k:{"mountPath":"/var/log/pods"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                    f:readOnly: {}
+            f:dnsPolicy: {}
+            f:restartPolicy: {}
+            f:schedulerName: {}
+            f:securityContext: {}
+            f:serviceAccount: {}
+            f:serviceAccountName: {}
+            f:terminationGracePeriodSeconds: {}
+            f:tolerations: {}
+            f:volumes:
+              .: {}
+              k:{"name":"config"}:
+                .: {}
+                f:configMap:
+                  .: {}
+                  f:defaultMode: {}
+                  f:name: {}
+                f:name: {}
+              k:{"name":"docker"}:
+                .: {}
+                f:hostPath:
+                  .: {}
+                  f:path: {}
+                  f:type: {}
+                f:name: {}
+              k:{"name":"pods"}:
+                .: {}
+                f:hostPath:
+                  .: {}
+                  f:path: {}
+                  f:type: {}
+                f:name: {}
+              k:{"name":"run"}:
+                .: {}
+                f:hostPath:
+                  .: {}
+                  f:path: {}
+                  f:type: {}
+                f:name: {}
+        f:updateStrategy:
+          f:rollingUpdate:
+            .: {}
+            f:maxUnavailable: {}
+          f:type: {}
+    manager: Go-http-client
+    operation: Update
+    time: "2021-04-15T10:54:43Z"
+  - apiVersion: apps/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:currentNumberScheduled: {}
+        f:desiredNumberScheduled: {}
+        f:numberUnavailable: {}
+        f:observedGeneration: {}
+        f:updatedNumberScheduled: {}
+    manager: kube-controller-manager
+    operation: Update
+    time: "2021-04-15T10:54:43Z"
+  name: loki-promtail
+  namespace: monitor
+  resourceVersion: "4911506"
+  selfLink: /apis/apps/v1/namespaces/monitor/daemonsets/loki-promtail
+  uid: 283ef8ef-78c5-4617-a2eb-d5e58fd4152f
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: promtail
+      release: loki
+  template:
+    metadata:
+      annotations:
+        checksum/config: 1ad5acf60d66e9f119f0cdf42fe80f63ff995a479c13616ae313c652c68e3987
+        prometheus.io/port: http-metrics
+        prometheus.io/scrape: "true"
+      creationTimestamp: null
+      labels:
+        app: promtail
+        release: loki
+    spec:
+      affinity: {}
+      containers:
+      - args:
+        - -config.file=/etc/promtail/promtail.yaml
+        - -client.url=http://loki:3100/loki/api/v1/push
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: grafana/promtail:2.0.0
+        imagePullPolicy: IfNotPresent
+        name: promtail
+        ports:
+        - containerPort: 3101
+          name: http-metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ready
+            port: http-metrics
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsGroup: 0
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/promtail
+          name: config
+        - mountPath: /run/promtail
+          name: run
+        - mountPath: /data/sys/var/docker/containers
+          name: docker
+          readOnly: true
+        - mountPath: /var/log/pods
+          name: pods
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: loki-promtail
+      serviceAccountName: loki-promtail
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: loki-promtail
+        name: config
+      - hostPath:
+          path: /run/promtail
+          type: ""
+        name: run
+      - hostPath:
+          path: /data/sys/var/docker/containers
+          type: ""
+        name: docker
+      - hostPath:
+          path: /var/log/pods
+          type: ""
+        name: pods
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 3
+  desiredNumberScheduled: 3
+  numberMisscheduled: 0
+  numberReady: 0
+  numberUnavailable: 3
+  observedGeneration: 1
+  updatedNumberScheduled: 3

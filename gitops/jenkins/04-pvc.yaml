@@ -1,0 +1,21 @@
+---
+## PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins
+  namespace: jenkins
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "gitops-data"
+    #everest.io/disk-volume-type: SAS
+  #labels:
+    #failure-domain.beta.kubernetes.io/region: cn-east-3
+    #failure-domain.beta.kubernetes.io/zone: cn-east-3a
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  #storageClassName: csi-disk
+---

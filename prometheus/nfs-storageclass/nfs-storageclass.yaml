@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: prometheus-data-db
+provisioner: prometheus-nfs-storage
+parameters:
+  archiveOnDelete: "ture"  
+

@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: k8s
+    role: alert-rules
+  name: black-exporter-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: black-exporter
+    rules:
+    - alert: httpServerError
+      annotations:
+        message: http服务 {{ $labels.target }} 丢失
+      expr: |
+        probe_success{module="http_2xx"} == 0
+      for: 3m
+      labels:
+        severity: critical

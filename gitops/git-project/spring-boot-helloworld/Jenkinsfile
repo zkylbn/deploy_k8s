@@ -1,0 +1,45 @@
+pipeline {
+    environment {
+        appName = "dockerhub.datagrand.com/test_zky/spring-boot-helloworld"
+        appVersion = "0.9.4"
+        registry = "https://dockerhub.datagrand.com"
+        registryCredential = "dockerhub-user"
+        dockerimage = ""
+    }
+
+    agent {
+        kubernetes {
+            inheritFrom "maven-and-docker"
+        }
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                container('maven') {
+                    sh 'mvn clean test package'
+                }
+            }
+        }
+        stage('Building app image') {
+            steps {
+                container('docker') {
+                    script {
+                        dockerimage = docker.build appName + ':' + appVersion
+                    }
+                }
+            }
+        }
+        stage('Push app image') {
+            steps {
+                container('docker') {
+                    script {
+                        docker.withRegistry(registry,registryCredential) {
+                            dockerimage.push()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
