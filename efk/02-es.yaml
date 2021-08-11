@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: es
+  namespace: efk
+spec:
+  serviceName: elasticsearch
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      nodeSelector:
+        isEs: "true"
+      initContainers:
+      - name: increase-vm-max-map
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]    # 添加mmap计数限制
+        securityContext:    # 仅应用到指定的容器上，并且不会影响volume
+          privileged: true
+      - name: increase-fd-ulimit
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "ulimit -n 65535"]    # 修改文件描述符最大数量
+        securityContext:
+          privileged: true
+      containers:
+      - name: elasticsearch
+        image: dockerhub.datagrand.com/yunwei-k8s/elasticsearch/elasticsearch:7.6.2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: rest
+          containerPort: 9200   # Restapi
+        - name: inter
+          containerPort: 9300   # 节点通信
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 1000m
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+        env:
+        - name: cluster.name    # es集群的名称
+          value: k8s-logs
+        - name: node.name
+          valueFrom:    # 通过匹配上面metadata.name来当节点的名称
+            fieldRef:
+              fieldPath: metadata.name
+        - name: cluster.initial_master_nodes    # 初始化集群引导，需要是Pod的名称
+          value: "es-0,es-1,es-2"
+        - name: discovery.zen.minimum_master_nodes  # 节点数量，高可用集群至少3个主节点，其中2个至少不仅投票节点
+          value: "2"
+        - name: discovery.seed_hosts    # 用于es集群中节点互相连接发现
+          value: "elasticsearch"
+        - name: ES_JAVA_OPTS    # 设置java的内存参数
+          value: "-Xms512m -Xmx512m"
+        - name: network.host
+          value: "0.0.0.0"
+  volumeClaimTemplates: # 定义持久化模版
+  - metadata:
+      name: data
+      labels:
+        app: elasticsearch
+    spec:
+      accessModes: ["ReadWriteOnce"]    # 访问模式
+      storageClassName: efk-data
+      resources:
+        requests:
+          storage: 20Gi
+
+
