@@ -30,6 +30,7 @@ spec:
     spec:
       containers:
       - name: kibana
+        #image: docker.elastic.co/kibana/kibana:7.6.2
         image: dockerhub.datagrand.com/yunwei-k8s/kibana/kibana:7.6.2
         resources:
           limits:

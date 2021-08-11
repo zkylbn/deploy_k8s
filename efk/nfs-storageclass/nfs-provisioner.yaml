@@ -25,13 +25,13 @@ spec:
             - name: PROVISIONER_NAME
               value: efk-data-storage
             - name: NFS_SERVER
-              value: 1cd6e49960-bee93.cn-beijing.nas.aliyuncs.com
+              value: NFS_SERVER
             - name: NFS_PATH
               value: /yunwei/efk
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 1cd6e49960-bee93.cn-beijing.nas.aliyuncs.com
+            server: NFS_SERVER
             path: /yunwei/efk
     
 
